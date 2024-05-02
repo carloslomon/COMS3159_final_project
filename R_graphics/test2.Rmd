@@ -1,0 +1,323 @@
+---
+title: "tests"
+author: "Jose Fernandez and Carlos Lopez"
+date: "2024-05-01"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r echo=FALSE}
+# Load necessary libraries
+library(ggplot2)
+library(readr)
+library(tidyr)
+library(dplyr)
+library(readxl)
+library(reshape2)
+
+n100 <- read_excel("n100.xlsx")
+#View(n100)
+colnames(n100) <- c("filter", "numba", "CUDA")
+
+# Load necessary libraries
+library(ggplot2)
+capitalize_and_replace <- function(name) {
+  # Capitalize the name
+  name <- tolower(name) 
+  name <- sub("^(.)", "\\U\\1", name, perl=TRUE)  
+  name <- gsub("sharr", "Scharr", name, ignore.case=TRUE)
+  return(name)
+  }
+# Apply the function to the Filter column
+n100$filter <- sapply(n100$filter, capitalize_and_replace)
+# Assuming n100 is your dataframe and it has columns Filter, numba, CUDA
+filters <- unique(n100$filter)
+
+
+# data frame to store t-test results
+t_test_results <- data.frame()
+
+# Data frame 4 all boxplot data
+all_boxplot_data <- data.frame()
+
+for(current_filter in filters){
+  # Subset the data for the current filter
+  subset_n100 <- n100 %>% filter(filter == current_filter)
+  
+  # Perform a two-sample t-test
+  t_test_result <- t.test(subset_n100$numba, subset_n100$CUDA)
+  
+  # Store t-test results
+  t_test_results <- rbind(t_test_results, broom::tidy(t_test_result) %>% mutate(Filter = current_filter))
+  
+  # Prepare data for box plots
+  boxplot_data <- melt(subset_n100[,c("numba", "CUDA")], id.vars = NULL) %>% mutate(Filter = current_filter)
+  all_boxplot_data <- rbind(all_boxplot_data, boxplot_data)
+}
+
+# Plotting all boxplots together
+p <- ggplot(all_boxplot_data, aes(x = interaction(variable, Filter), y = value, fill = variable)) +
+  geom_boxplot() +
+  labs(title = "Boxplots for Each Filter (n=100)",
+       x = "Filter and Implementation",
+       y = "Time in Miliseconds") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x labels for better visibility
+
+# combined box plot
+print(p)
+
+# t-test results data frame
+print(t_test_results)
+
+#End n100
+
+#############
+
+#Start n1000
+
+
+n1000 <- read_excel("n1000.xlsx")
+#View(n100)
+colnames(n1000) <- c("filter", "numba", "CUDA")
+n1000$filter <- sapply(n1000$filter, capitalize_and_replace)
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+library(reshape2)
+library(broom)  # For tidy t-test results
+
+
+filters <- unique(n1000$filter)
+
+# data frame to store t-test results
+t_test_results <- data.frame()
+
+# Data frame 4 all boxplot data
+all_boxplot_data <- data.frame()
+
+for(current_filter in filters){
+  # Subset the data for the current filter
+  subset_n1000 <- n1000 %>% filter(filter == current_filter)
+  
+  # Perform a two-sample t-test
+  t_test_result <- t.test(subset_n1000$numba, subset_n1000$CUDA)
+  
+  # Store t-test results
+  t_test_results <- rbind(t_test_results, broom::tidy(t_test_result) %>% mutate(Filter = current_filter))
+  
+  # Prepare data for box plots
+  boxplot_data <- melt(subset_n1000[,c("numba", "CUDA")], id.vars = NULL) %>% mutate(Filter = current_filter)
+  all_boxplot_data <- rbind(all_boxplot_data, boxplot_data)
+}
+
+# Plotting all boxplots together
+p <- ggplot(all_boxplot_data, aes(x = interaction(variable, Filter), y = value, fill = variable)) +
+  geom_boxplot() +
+  labs(title = "Boxplots for Each Filter (n=1000)",
+       x = "Filter and Implementation",
+       y = "Time in Miliseconds") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x labels for better visibility
+
+# combined box plot
+print(p)
+
+# t-test results data frame
+print(t_test_results)
+
+#End n1000
+#################################################
+#Start 10000
+
+n10000 <- read_excel("n10000.xlsx")
+#View(n100)
+
+colnames(n10000) <- c("filter", "numba", "CUDA")
+n10000$filter <- sapply(n10000$filter, capitalize_and_replace)
+
+library(ggplot2)
+library(dplyr)
+library(reshape2)
+library(broom)  # For tidy t-test results
+
+
+filters <- unique(n1000$filter)
+
+# data frame to store t-test results
+t_test_results <- data.frame()
+
+# Data frame 4 all boxplot data
+all_boxplot_data <- data.frame()
+
+for(current_filter in filters){
+  # Subset the data for the current filter
+  subset_n10000 <- n10000 %>% filter(filter == current_filter)
+  
+  # Perform a two-sample t-test
+  t_test_result <- t.test(subset_n10000$numba, subset_n10000$CUDA)
+  
+  # Store t-test results
+  t_test_results <- rbind(t_test_results, broom::tidy(t_test_result) %>% mutate(Filter = current_filter))
+  
+  # Prepare data for box plots
+  boxplot_data <- melt(subset_n10000[,c("numba", "CUDA")], id.vars = NULL) %>% mutate(Filter = current_filter)
+  all_boxplot_data <- rbind(all_boxplot_data, boxplot_data)
+}
+
+# Plotting all boxplots together
+p <- ggplot(all_boxplot_data, aes(x = interaction(variable, Filter), y = value, fill = variable)) +
+  geom_boxplot() +
+  labs(title = "Boxplots for Each Filter (n=10000)",
+       x = "Filter and Implementation",
+       y = "Time in Miliseconds") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x labels for better visibility
+
+# combined box plot
+print(p)
+
+# t-test results data frame
+print(t_test_results)
+
+#End n10000
+
+##################################
+
+
+# List of data frames
+data_frames <- list(n100 = n100, n1000 = n1000, n10000 = n10000)
+
+# Loop over each data frame
+for(name in names(data_frames)){
+  # Get the current data frame
+  df <- data_frames[[name]]
+  
+  # Get the unique filters in the current data frame
+  filters <- unique(df$filter)
+  
+  # Loop over each filter
+  for(filter in filters){
+    # Subset the data for the current filter
+    subset_df <- subset(df, filter == filter)
+    
+    # Perform a two-sample t-test
+    t_test_result <- t.test(subset_df$numba, subset_df$CUDA)
+    
+    # Store the t-test result
+    result <- data.frame(
+      "Dataset" = name,
+      "filter" = filter,
+      "t_value" = t_test_result$statistic,
+      "p_value" = t_test_result$p.value
+    )
+    
+    # Append the result to the results data frame
+    results <- rbind(results, result)
+    
+    # Print the results data frame
+   # print(results)
+  }
+}
+
+
+# Initialize an empty data frame to store results
+results <- data.frame()
+
+# List of data frames
+data_frames <- list(n100 = n100, n1000 = n1000, n10000 = n10000)
+
+# Loop over each data frame
+for(name in names(data_frames)){
+  # Get the current data frame
+  df <- data_frames[[name]]
+  
+  # Get the unique filters in the current data frame
+  filters <- unique(df$filter)
+  
+  # Loop over each filter
+  for(filter in filters){
+    # Subset the data for the current filter
+    subset_df <- subset(df, filter == filter)
+    
+    # Perform a two-sample t-test
+    t_test_result <- t.test(subset_df$numba, subset_df$CUDA)
+    
+    # Store the t-test result
+    result <- data.frame(
+      "Dataset" = name,
+      "filter" = filter,
+      "t_value" = t_test_result$statistic,
+      "p_value" = t_test_result$p.value
+    )
+    
+    # Append the result to the results data frame
+    results <- rbind(results, result)
+  }
+}
+
+
+n100$n <- rep(100, nrow(n100))
+n1000$n <- rep(1000, nrow(n1000))
+n10000$n <- rep(10000, nrow(n10000))
+joined = rbind(n100, n1000, n10000)
+
+library(tidyr)
+
+# Reshape the data
+joined_long <- gather(joined, implementation, value, numba:CUDA)
+temp = joined_long
+# Print the reshaped data
+print(joined_long)
+
+library(ggplot2)
+
+# Predefined list of filters
+filters <- c('sobel', 'prewitt', 'sharr', 'laplace', 'canny')
+
+
+
+joined_long <- joined_long %>%
+  group_by(filter, n, implementation) %>%
+  summarise(mean_value = mean(value, na.rm = TRUE))
+
+# Define line types and colors for each filter and implementation
+line_types <- c("CUDA" = "dotted", "numba" = "solid")
+colors <- c("sobel" = "red", "prewitt" = "blue", "sharr" = "green", "laplace" = "purple", "canny" = "orange")
+
+
+# Create the plot
+ggplot(joined_long, aes(x = as.factor(n), y = mean_value, color = filter, linetype = implementation, group = interaction(filter, implementation))) +
+  geom_line(size = 1.5) +  # Increase line thickness
+  geom_point() +
+  scale_color_manual(values = colors) +
+  scale_linetype_manual(values = line_types) +
+  labs(x = "n", y = "Mean Value", color = "Filter", linetype = "Implementation") +
+  theme_minimal() +
+  ggtitle("Mean Values of Each Filter Given n")
+
+
+
+
+
+# Calculate the variance for each group
+joined_long <- temp %>%
+  group_by(filter, n, implementation) %>%
+  summarise(variance = var(value, na.rm = TRUE))
+
+# Perform ANOVA for each filter
+for(filter in unique(joined_long$filter)) {
+  print(paste("ANOVA for filter:", filter))
+  
+  # Subset the data for the current filter
+  data_subset <- subset(joined_long, filter == filter)
+  
+  # Perform ANOVA
+  result <- aov(variance ~ implementation + as.factor(n), data = data_subset)
+  
+  # Print the summary of the ANOVA result
+  print(summary(result))
+}
+
+```
